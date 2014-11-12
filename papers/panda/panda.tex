@@ -52,9 +52,6 @@ machines may derive new identifiers using only a password or shared key. Thus
 we remove the requirement that any other communication must occur before
 re-establishing entirely new identifiers.
 
-Additionally we'll explore the concept of a PAKE-based datastore and how
-this can improve operational security procedures.
-
 \section{Introduction}
 
 % we should rephrase this to not be so closely worded to the Abstract
@@ -315,57 +312,6 @@ common household objects may also serve as a time limited entropy source. As an
 example, additional entropy could be added from other sources such as the state
 of a Rubik's cube or a similar object.
 
-
-\section{PAKE-based key-value storage service}
-
-Much like the meeting point for PANDA... this PAKE key-value storage system
-must have a centralized host (Tor Hidden Service), grid of hosts or a decentralized
-key value store. To store or retreive content the user must contact this system.
-
-For the moment we shall exaplain the simplest design wherein the this storage service
-uses a single Tor Hidden Service and a 1-2-3 secret PAKE scheme described like this:
-
-The user either posses three passphrases called secret-1, secret-2 and secret-3.
-Alternatively a single passphrase can be divided in three parts.
-
-Firstly, let's describe how a user retrieves a secret blob from the system:
-
-Secret-1 is used in a traditional salted password challenge. This first secret serves several purposes;
-it tells the server which PAKE secret to use for the next protocol step and it gives the client the right
-to guess the PAKE secret. This severely raises the difficulty of an online attack on the PAKE secret.
-
-Secret-2 is used for a PAKE with the server. If successful the server
-sends the stashed ciphertext blob to the client using the session key
-from the PAKE. The server uses a key-value store... and retrieves the
-stashed ciphertext blob using the cryptographic hash of the passphrase
-as the key.
-
-The client derives the symmetric key used for decrypting the ciphertext blob via scrypt stretching secret-3.
-The ciphertext blob is output from NaCl's SecretBox; ciphertext + nonce. This of course
-gives us the desirable properties of confidentiality and authenticity.
-
-There is little incentive to scrypt key stretching secret-1 or secret-2 since an attacker need only
-hack our key-value PAKE server to bypass this necessity. Depending on the use-case secret-3
-can have a little or large amount of scrypt key stretching.
-
-
-\section{Applications of a PAKE-based key-value storage system}
-
-There are many applications and operational procedures that require knowledge of secrets that are too
-large for humans to remember. This key-value store provides a reliable, anonymous, confidential
-and authenticated passphrase interface for the storage and retrieval of secret information.
-
-Operators of Tor Hidden Services may wish to frequently change their onion address.
-Using this key-value store operators setup their Tor Hidden Services to automatically change their
-onion address and update the PAKE key-value store with the new onion. The operator gains access
-to the current onion address using the PAKE key-value store.
-
-This PAKE accessible key-value storage system is remarkably useful when used with Tahoe-LAFS (the Least-Authoritative File System).
-Users of Tahoe-LAFS will absolutely lose access to their data forever if their Tahoe-LAFS cryptographic capabilities are lost.
-If Tahoe-LAFS users store there end-to-end verifiably encrypted Tahoe-LAFS cryptographic capabilities in this
-key-value store then this could be used to recover upon a total dataloss scenario.
-
-
 \section{Conclusion}
 
 Our design allows a pair or a group of people to discover or rediscover
@@ -376,7 +322,7 @@ after a full client compromise.
 
 \section*{Acknowledgements}
 
-We would like to thank Leif Ryge, David Stainton, Steve Weis, Ralf Philip-Weinmann, Julian
+We would like to thank Leif Ryge, Steve Weis, Ralf Philip-Weinmann, Julian
 Assange and other anonymous cypherpunks who contributed valuable feedback in
 the creation of this design.
 
